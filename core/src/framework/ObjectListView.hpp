@@ -48,6 +48,8 @@ public:
 
     virtual size_t size() const = 0;
 
+    virtual bool contains(std::shared_ptr<T> element) const = 0;
+
     std::list<std::shared_ptr<T>> sharedPointerView() {
         std::list<std::shared_ptr<T>> result;
         for (auto& element : *this) {

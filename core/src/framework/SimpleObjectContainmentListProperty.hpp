@@ -46,6 +46,15 @@ public:
         return elements.size();
     }
 
+    bool contains(std::shared_ptr<T> element) const override {
+        for (auto& current : elements) {
+            if (current == element) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     std::shared_ptr<T> front() override {
         if (elements.empty()) {
             return {};

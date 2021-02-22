@@ -54,6 +54,15 @@ public:
         return references.size();
     }
 
+    bool contains(std::shared_ptr<T> element) const override {
+        for (auto& current : references) {
+            if (&current.get() == element.get()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void forEach(std::function<void(const T &)> consumer) const override {
         std::for_each(references.cbegin(), references.cend(), consumer);
     }
