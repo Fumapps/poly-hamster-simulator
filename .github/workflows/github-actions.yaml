@@ -2,9 +2,9 @@ name: Java CI with Maven / CMake
 
 on:
   push:
-    branches: [ 'master' ]
+    branches: [ 'master', 'review-2021-02' ]
   pull_request:
-    branches: [ 'master' ]
+    branches: [ 'master', 'review-2021-02' ]
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
 
       # Build and test Java Framework
       - name: Build Java Framework
-        run: mvn -Dmaven.javadoc.skip=true -B deploy --file simulators/de.unistuttgart.iste.sqa.mpw.framework.java/pom.xml
+        run: mvn -Dmaven.javadoc.skip=true -B package --file simulators/de.unistuttgart.iste.sqa.mpw.framework.java/pom.xml
         env:
           SNAPSHOT_REPOSITORY_URL: file:///${HOME}/deploy-java-framework-to-branch/repository
 
@@ -38,38 +38,3 @@ jobs:
         env:
           PROJECT_CPP_DIR: simulators/de.unistuttgart.iste.sqa.mpw.framework.cpp
           BUILD_DIR: simulators/de.unistuttgart.iste.sqa.mpw.framework.cpp/build
-
-      # Copy deployment artifacts
-      - name: copy updatesite repository
-        run:  mkdir ~/deploy-updatesite-to-branch && cp -R releng/de.unistuttgart.iste.sqa.mpw.updatesite/target/repository ~/deploy-updatesite-to-branch
-      - name: copy cpp framework
-        run:  mkdir ~/deploy-cpp-framework-to-branch && cp -R simulators/de.unistuttgart.iste.sqa.mpw.framework.cpp/core ~/deploy-cpp-framework-to-branch && cp simulators/de.unistuttgart.iste.sqa.mpw.framework.cpp/CMakeLists.txt ~/deploy-cpp-framework-to-branch
-        
-      # Prepare Git Repository
-      - name: set identity
-        run: git config user.email "44242539+fumapps@users.noreply.github.com" && git config user.name "Mario Fuksa"
-
-      # Deploy update-site to branch
-      - name: switch to updatesite branch
-        run: git fetch && git checkout mpw-update-site && git reset --hard db24f3d4f34d25d6634350bb909c90ab21589a01
-      - name: updatesite branch repository folder
-        run: git clean -ffd && rm -rf ./repository && cp -R ~/deploy-updatesite-to-branch/repository ./repository
-      - name: commit
-        run: git add -A && git commit -am 'Update repository snapshot' && git push origin mpw-update-site --force
-
-      # Deploy cpp-framework to branch
-      - name: switch to cpp framework branch
-        run: git fetch && git checkout cpp-framework && git reset --hard e8389b8b97c803777473011ca5f6c769a33b6875
-      - name: cpp framework branch core folder
-        run: git clean -ffd && rm -rf ./core && rm -f CMakeLists.txt && cp -R ~/deploy-cpp-framework-to-branch/core ./core && cp ~/deploy-cpp-framework-to-branch/CMakeLists.txt ./CMakeLists.txt
-      - name: commit
-        run: git add -A && git commit -am 'C++ framework code snapshot' && git push origin cpp-framework --force
-
-      # Deploy java-framework to branch
-      - name: switch to java framework branch
-        run: git fetch && git checkout mpw-framework-repository && git reset --hard c03bae99a8aca5e6785db3bab2063dc693cf3f72
-      - name: java framework repository folder
-        run: git clean -ffd && rm -rf ./repository && cp -R ~/deploy-java-framework-to-branch/repository ./repository
-      - name: commit
-        run: git add -A && git commit -am 'Java framework repository snapshot' && git push origin mpw-framework-repository --force
-
